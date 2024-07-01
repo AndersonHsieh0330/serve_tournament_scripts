@@ -11,33 +11,10 @@
         N - number of signup teams on each 6 man team. N = 6/X. For example, N = 3 for 3ps tournament
         X - number of players on each signup teams. 6 = X * N.
 '''
-from util import *
-######################################################################################
-######### Edit this section and nothing else if ur not modifying the script ##########
-######################################################################################
-num_of_teams = 14
-num_of_total_games = 11
-n = 2
-schedule = [
-[[[1,2],[3,4]],[[5,6],[7,8]]],
-[[[9,10],[11,12]],[[13,14],[1,5]]],
-[[[2,6],[9,13]],[[3,7],[10,14]]],
-[[[4,8],[5,9]],[[6,10],[7,11]]],
-[[[2,7],[6,12]],[[3,11],[5,14]]],
-[[[2,12],[3,13]],[[4,14],[8,10]]],
-[[[4,5],[8,9]],[[12,13],[1,14]]],
-[[[2,3],[6,7]],[[1,4],[5,11]]],
-[[[8,12],[9,13]],[[10,14],[1,11]]],
-[[[3,13],[6,11]],[[4,12],[7,10]]],
-[[[1,8],[2,9]],[[0,0],[0,0]]]
-# add more rows if needed
-# if one of the courts during the last game is purposely left open, write all 0s
-]
-######################################################################################
-######### Edit this section and nothing else if ur not modifying the script ##########
-######################################################################################
+from write_output import *
+from parse_schedule import *
 
-def check_play_with(cur_schedule):
+def check_play_with(cur_schedule, num_of_teams):
     '''
         this is a 2D array that shows how many times each team play with another team
         for example: play_with_table[1][3]
@@ -63,7 +40,7 @@ def check_play_with(cur_schedule):
 
     return play_with_table
 
-def check_play_against(cur_schedule):
+def check_play_against(cur_schedule, num_of_teams):
     '''
         this is a 2D array that shows how many times each team play against another team
         for example: play_with_table[1][3]
@@ -91,7 +68,7 @@ def check_play_against(cur_schedule):
 
 # check that no team is numbered 0 by accident
 # if there is a zero check that all the slots in court are 0s(empty court left on purpose)
-def check_zeros(cur_schedule):
+def check_zeros(cur_schedule, num_of_total_games):
     games_with_error = [False for i in range(num_of_total_games)]
 
     for game_index, game in enumerate(cur_schedule):
@@ -125,7 +102,7 @@ def check_zeros(cur_schedule):
 
     
 # check that no one team is on two courts or two sides of the same court during the same game
-def check_duplicated_teams(cur_schedule):
+def check_duplicated_teams(cur_schedule, num_of_total_games):
     games_with_error = [False for i in range(num_of_total_games)]
 
     for game_index, game in enumerate(cur_schedule):
@@ -149,7 +126,7 @@ def check_duplicated_teams(cur_schedule):
     in case we do want different number of games between each teams
     even though we basically run the same code to step through each team twice
 '''
-def check_num_of_games(cur_schedule):
+def check_num_of_games(cur_schedule, num_of_teams):
     num_of_games_each_team_dict = {key: 0 for key in range(num_of_teams)}
 
     # iterate through each team and count the number of times they appear
@@ -164,28 +141,31 @@ def check_num_of_games(cur_schedule):
 
 
 def main():
+    input_file = sys.argv[1]            
+    input_file = open(input_file, "rt")
+    num_of_teams, num_of_total_games, n, schedule = parse_input_schedule_file(input_file)
+
     # sanity checks
     sanity_check_passed = True
     if num_of_total_games != len(schedule) :
         print("Number of games in the schedule not equal to number of total games specified")
         sanity_check_passed = False
 
-    games_with_duplicate_teams = check_duplicated_teams(schedule)
-    games_with_team_zero_error = check_zeros(schedule)
+    games_with_duplicate_teams = check_duplicated_teams(schedule, num_of_total_games)
+    games_with_team_zero_error = check_zeros(schedule, num_of_total_games)
 
-    if 1 in games_with_team_zero_error or 1 in games_with_duplicate_teams:
-        sanity_check_passed = False
+    sanity_check_passed = not(1 in games_with_team_zero_error or 1 in games_with_duplicate_teams)
     
     # open output file and start writing to it
-    file = open("output.txt", "wt")
-    write_output_header(file)
+    output_file = open("output.txt", "wt")
+    write_output_header(output_file, num_of_teams, num_of_total_games, n, schedule)
     write_output_game_list(
-        file,
+        output_file,
         games_with_duplicate_teams,
         "Games marked with True has one team appearing in two different slots.\nThe duplicated number can be on the same side, opposite teams or different court"
     )
     write_output_game_list(
-        file,
+        output_file,
         games_with_team_zero_error,
         "Games marked with True has team 0 specified, but that game was not left empty intentionally.\nWhen team 0 is specified in one slot, all the other slots in that court should be 0 as well,\nshowing that that course is intentionally left empty"
    )
@@ -193,31 +173,31 @@ def main():
     # no need to run the rest of the tests if duplicate team error exists
     if sanity_check_passed:
 
-        num_of_games_each_team_dict = check_num_of_games(schedule)
+        num_of_games_each_team_dict = check_num_of_games(schedule, num_of_teams)
         write_output_team_dict(
-            file,
+            output_file,
             num_of_games_each_team_dict,
             "Number of games played by each team is shown below"
         )
 
-        play_with_table = check_play_with(schedule)
+        play_with_table = check_play_with(schedule, num_of_teams)
         write_output_2d_array(
-            file, 
+            output_file, 
             play_with_table, 
             "Play with table shown below.\nFor better readability copy the whole block and paste in to excel. T stands for Team"
         )
 
-        play_against_table = check_play_against(schedule)
+        play_against_table = check_play_against(schedule, num_of_teams)
         write_output_2d_array(
-            file, 
+            output_file, 
             play_against_table, 
             "Play against table shown below.\nFor better readability copy the whole block and paste in to excel. T stands for Team"
         )
     else:
-        file.write("Sanity checks did not pass, other tests were not ran. Get rid of those errors first")
+        output_file.write("\nSanity checks did not pass, other tests were not ran. Get rid of those errors first\n")
 
-    file.close()
+    output_file.close()
+    input_file.close()
         
-
 if __name__ == '__main__':
     main()
