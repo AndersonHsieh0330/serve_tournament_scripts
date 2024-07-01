@@ -11,6 +11,7 @@
         N - number of signup teams on each 6 man team. N = 6/X. For example, N = 3 for 3ps tournament
         X - number of players on each signup teams. 6 = X * N.
 '''
+from util import *
 ######################################################################################
 ######### Edit this section and nothing else if ur not modifying the script ##########
 ######################################################################################
@@ -169,19 +170,26 @@ def main():
         print("Number of games in the schedule not equal to number of total games specified")
         sanity_check_passed = False
 
+    # run sanity checks
     games_with_duplicate_teams = check_duplicated_teams(schedule)
-    print(games_with_duplicate_teams)
-
-    if 1 in games_with_duplicate_teams:
-        print("Same team appeared twice in the same game")
-        sanity_check_passed = False
-
     games_with_team_zero_error = check_zeros(schedule)
-    print(games_with_team_zero_error)
 
-    if 1 in games_with_team_zero_error:
-        print("Team number 0 appeared in a game not left blank on purpose")
+    if 1 in games_with_team_zero_error or 1 in games_with_duplicate_teams:
         sanity_check_passed = False
+    
+    # open output file and start writing to it
+    file = open("output.txt", "wt")
+    write_output_header(file)
+    write_output_game_list(
+        file,
+        games_with_duplicate_teams,
+        "Games marked with True has one team appearing in two different slots.\nThe duplicated number can be on the same side, opposite teams or different court"
+    )
+    write_output_game_list(
+        file,
+        games_with_team_zero_error,
+        "Games marked with True has team 0 specified, but that game was not left empty intentionally.\nWhen team 0 is specified in one slot, all the other slots in that court should be 0 as well,\nshowing that that course is intentionally left empty"
+   )
 
     # no need to run the rest of the tests if duplicate team error exists
     if sanity_check_passed:
@@ -194,6 +202,10 @@ def main():
 
         play_against_table = check_play_against(schedule)
         print(play_against_table)
+    else:
+        file.write("Sanity checks did not pass, other tests were not ran. Get rid of those errors first")
+
+    file.close()
         
 
 if __name__ == '__main__':
