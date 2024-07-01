@@ -170,7 +170,6 @@ def main():
         print("Number of games in the schedule not equal to number of total games specified")
         sanity_check_passed = False
 
-    # run sanity checks
     games_with_duplicate_teams = check_duplicated_teams(schedule)
     games_with_team_zero_error = check_zeros(schedule)
 
@@ -195,13 +194,25 @@ def main():
     if sanity_check_passed:
 
         num_of_games_each_team_dict = check_num_of_games(schedule)
-        print(num_of_games_each_team_dict)
+        write_output_team_dict(
+            file,
+            num_of_games_each_team_dict,
+            "Number of games played by each team is shown below"
+        )
 
         play_with_table = check_play_with(schedule)
-        print(play_with_table)
+        write_output_2d_array(
+            file, 
+            play_with_table, 
+            "Play with table shown below.\nFor better readability copy the whole block and paste in to excel. T stands for Team"
+        )
 
         play_against_table = check_play_against(schedule)
-        print(play_against_table)
+        write_output_2d_array(
+            file, 
+            play_against_table, 
+            "Play against table shown below.\nFor better readability copy the whole block and paste in to excel. T stands for Team"
+        )
     else:
         file.write("Sanity checks did not pass, other tests were not ran. Get rid of those errors first")
 
