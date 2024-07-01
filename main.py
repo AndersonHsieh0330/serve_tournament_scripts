@@ -13,6 +13,8 @@
 '''
 from write_output import *
 from parse_schedule import *
+from util import *
+import sys
 
 def check_play_with(cur_schedule, num_of_teams):
     '''
@@ -141,7 +143,8 @@ def check_num_of_games(cur_schedule, num_of_teams):
 
 
 def main():
-    input_file = sys.argv[1]            
+    input_file = sys.argv[1] # input file path           
+
     input_file = open(input_file, "rt")
     num_of_teams, num_of_total_games, n, schedule = parse_input_schedule_file(input_file)
 
@@ -193,9 +196,23 @@ def main():
             play_against_table, 
             "Play against table shown below.\nFor better readability copy the whole block and paste in to excel. T stands for Team"
         )
+
+        # check thresholds if they are defined, run test if both defined, else just ignore
+        if len(sys.argv) >= 4 and sys.argv[2].isnumeric() and sys.argv[3].isnumeric():
+            play_with_threshold = int(sys.argv[2]) # max amount of games one team can play with another
+            play_against_threshold = int(sys.argv[3]) # max amount of games one team can play aginst another
+            play_with_threshold_test_failed = comp_num_in_2d_array(play_with_table, play_with_threshold)
+            play_against_threshold_test_failed = comp_num_in_2d_array(play_against_table, play_against_threshold)
+            write_output_threshold_tests(output_file, "play_with", play_with_threshold, play_with_threshold_test_failed)
+            write_output_threshold_tests(output_file, "play_against", play_against_threshold, play_against_threshold_test_failed)
+
+            # print to console
+            print("play with test with max number " + str(play_with_threshold) + ("failed" if play_with_threshold_test_failed else "passed"))
+            print("play against test with max number " + str(play_against_threshold) + ("failed" if play_against_threshold_test_failed else "passed"))
     else:
         output_file.write("\nSanity checks did not pass, other tests were not ran. Get rid of those errors first\n")
 
+    print("script finished, output written to output.txt")
     output_file.close()
     input_file.close()
         
