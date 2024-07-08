@@ -14,7 +14,7 @@ this should work with any # amount of signed up teams as one "team", aka works f
 4. change directory(`cd`) to the repository directory
 5. execute the command below
 ```
-python ./main.py example_input 2 3
+python ./main.py ./example_input.txt 2 3
 ```
 6. you should see the result in output.txt
 

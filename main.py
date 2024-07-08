@@ -207,8 +207,8 @@ def main():
             write_output_threshold_tests(output_file, "play_against", play_against_threshold, play_against_threshold_test_failed)
 
             # print to console
-            print("play with test with max number " + str(play_with_threshold) + ("failed" if play_with_threshold_test_failed else "passed"))
-            print("play against test with max number " + str(play_against_threshold) + ("failed" if play_against_threshold_test_failed else "passed"))
+            print("play with test with max number " + str(play_with_threshold) + (" failed" if play_with_threshold_test_failed else " passed"))
+            print("play against test with max number " + str(play_against_threshold) + (" failed" if play_against_threshold_test_failed else " passed"))
     else:
         output_file.write("\nSanity checks did not pass, other tests were not ran. Get rid of those errors first\n")
 

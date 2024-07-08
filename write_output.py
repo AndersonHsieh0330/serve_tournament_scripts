@@ -44,7 +44,7 @@ def write_output_2d_array(file, two_d_array, description):
 
 def format_2d_array(two_d_array):
     # reference : https://stackoverflow.com/a/17871279
-    first_row = "\t" + ''.join(['T{}\t'.format(i) for i in range(len(two_d_array))]) + "\n"
+    first_row = "\t" + ''.join(['T{}\t'.format(i+1) for i in range(len(two_d_array))]) + "\n"
     return first_row + '\n'.join([''.join(['T' + str(row_index+1)] + ['\t{}'.format(item) for item in row]) for row_index,row in enumerate(two_d_array)])
 
 def write_output_threshold_tests(file, threshold_str, threshold, failed):
